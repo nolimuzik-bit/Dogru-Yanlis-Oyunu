@@ -131,8 +131,15 @@ function endGame() {
     const total = scenes.length;
     const ratio = correctCount / total;
 
+    const container = document.querySelector(".container");
+
+    // Resim ve butonları gizle
+    container.querySelector("#image").style.display = "none";
+    container.querySelector(".buttons").style.display = "flex";
+    container.querySelector(".buttons").style.display = "none";
+
     if (ratio >= 0.6) {
-        document.querySelector(".container").innerHTML = `
+        container.innerHTML += `
             <h2>🎉🎉 BRAVO 🎉🎉</h2>
             <p>Harika düşündün!</p>
             <p>👏👏👏</p>
@@ -141,7 +148,7 @@ function endGame() {
             </button>
         `;
     } else {
-        document.querySelector(".container").innerHTML = `
+        container.innerHTML += `
             <h2>🌱 Güzel denedin</h2>
             <p>Birlikte tekrar deneyelim mi?</p>
             <button onclick="restartGame()" style="font-size:18px;">
@@ -152,9 +159,23 @@ function endGame() {
 }
 
 function restartGame() {
+    // Sayaçları sıfırla
+    index = 0;
+    correctCount = 0;
 
- location.reload();
+    const container = document.querySelector(".container");
+
+    // Resim ve butonları geri göster
+    container.querySelector("#image").style.display = "block";
+    container.querySelector(".buttons").style.display = "flex";
+
+    // İlk resmi göster
+    document.getElementById("image").src = "img1.jpg";
+
+    // Feedback alanını temizle
+    document.getElementById("feedback").textContent = "";
 }
+
 </script>
 
 </body>
