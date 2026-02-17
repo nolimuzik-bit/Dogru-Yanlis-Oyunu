@@ -80,7 +80,7 @@ const scenes = [
 ];
 
 let index = 0;
-
+let score = 0;
 const feedback = document.getElementById("feedback");
 const correctSound = document.getElementById("soundCorrect");
 const wrongSound = document.getElementById("soundWrong");
@@ -91,6 +91,7 @@ function check(choice) {
         feedback.textContent = "👏";
         correctSound.currentTime = 0;
         correctSound.play();
+        score++; // ⭐ DOĞRU SAYISI ARTIYOR
     } else {
         feedback.textContent = "🤔";
         wrongSound.currentTime = 0;
@@ -110,14 +111,23 @@ function check(choice) {
 }
 
 function endGame() {
+
+    let message = "";
+
+    if (score === scenes.length) {
+        message = "🎉 Harika! Hepsini doğru düşündün 👏";
+    } else {
+        message = `🌱 ${score} doğru yaptın. Birlikte tekrar deneyelim`;
+    }
+
     document.querySelector(".container").innerHTML = `
-        <h2>🎉 Harika!</h2>
-        <p>Hepsini düşündün</p>
+        <h2>${message}</h2>
         <button onclick="restartGame()" style="font-size:18px;">
             🔄 Baştan Oyna
         </button>
     `;
 }
+
 
 function restartGame() {
     location.reload();
