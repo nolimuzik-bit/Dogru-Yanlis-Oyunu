@@ -2,19 +2,21 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Doğruyu Bul</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doğruyu Bul</title>
+
 <style>
 body {
     background-color: #eaf6ff;
     font-family: Arial, sans-serif;
     text-align: center;
+    margin: 0;
+    padding: 0;
 }
-
 
 .container {
     max-width: 420px;
-    margin: auto;
+    margin: 40px auto;
     background: white;
     padding: 20px;
     border-radius: 20px;
@@ -40,13 +42,8 @@ button {
     cursor: pointer;
 }
 
-.true {
-    background-color: #4CAF50;
-}
-
-.false {
-    background-color: #f44336;
-}
+.true { background-color: #4CAF50; }
+.false { background-color: #f44336; }
 
 #feedback {
     font-size: 50px;
@@ -57,8 +54,22 @@ button {
 
 <body>
 
-<div class="container" id="gameScreen" style="display:none;">
+<!-- BAŞLANGIÇ EKRANI -->
+<div id="startScreen" class="container">
+    <h2>👋 Yetişkinler için</h2>
+    <p>
+        Çocuğunuza resmi gösterin ve<br>
+        <strong>“Sence bu davranış doğru mu?”</strong> diye sorun.<br><br>
+        😊 Doğruysa yeşil butona<br>
+        😟 Yanlışsa kırmızı butona basmasını isteyin.
+    </p>
+    <button onclick="startGame()" style="font-size:20px; padding:10px 20px;">
+        ▶️ Başla
+    </button>
+</div>
 
+<!-- OYUN EKRANI -->
+<div id="gameScreen" class="container" style="display:none;">
     <img id="image" src="img1.jpg">
 
     <div class="buttons">
@@ -67,32 +78,34 @@ button {
     </div>
 
     <div id="feedback"></div>
-
 </div>
 
-<!-- 🔊 SESLER (BODY İÇİNDE OLMALI) -->
+<!-- SESLER -->
 <audio id="soundCorrect" src="alkis.mp3"></audio>
 <audio id="soundWrong" src="dusun.mp3"></audio>
 
 <script>
 const scenes = [
     true, false, true, false, true,
-    true, true, false, true, false
+    true, true, false, true, true
 ];
 
 let index = 0;
-let score = 0;
-const feedback = document.getElementById("feedback");
-const correctSound = document.getElementById("soundCorrect");
-const wrongSound = document.getElementById("soundWrong");
+
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+}
 
 function check(choice) {
+    const feedback = document.getElementById("feedback");
+    const correctSound = document.getElementById("soundCorrect");
+    const wrongSound = document.getElementById("soundWrong");
 
     if (choice === scenes[index]) {
         feedback.textContent = "👏";
         correctSound.currentTime = 0;
         correctSound.play();
-        score++; // ⭐ DOĞRU SAYISI ARTIYOR
     } else {
         feedback.textContent = "🤔";
         wrongSound.currentTime = 0;
@@ -112,43 +125,19 @@ function check(choice) {
 }
 
 function endGame() {
-
-    let message = "";
-
-    if (score === scenes.length) {
-        message = "🎉 Harika! Hepsini doğru düşündün 👏";
-    } else {
-        message = `🌱 ${score} doğru yaptın. Birlikte tekrar deneyelim`;
-    }
-
-    document.querySelector(".container").innerHTML = `
-        <h2>${message}</h2>
+    document.getElementById("gameScreen").innerHTML = `
+        <h2>🎉 Oyun Bitti</h2>
+        <p>Teşekkürler</p>
         <button onclick="restartGame()" style="font-size:18px;">
             🔄 Baştan Oyna
         </button>
     `;
 }
 
-
 function restartGame() {
+    index = 0;
     location.reload();
-} 
-function startGame() {
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("gameScreen").style.display = "block";
-    <div id="startScreen" class="container">
-    <h2>👋 Yetişkinler için</h2>
-    <p>
-        Çocuğunuza resmi gösterin ve<br>
-        <strong>“Sence bu davranış doğru mu?”</strong> diye sorun.<br><br>
-        😊 Doğruysa yeşil butona<br>
-        😟 Yanlışsa kırmızı butona basmasını isteyin.
-    </p>
-
-    <button onclick="startGame()" style="font-size:20px; padding:10px 20px;">
-        ▶️ Başla
-    </button>
-</div>
+}
 </script>
 
 </body>
