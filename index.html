@@ -106,6 +106,7 @@ function check(choice) {
         feedback.textContent = "👏";
         correctSound.currentTime = 0;
         correctSound.play();
+        correctCount++;
     } else {
         feedback.textContent = "🤔";
         wrongSound.currentTime = 0;
@@ -151,8 +152,8 @@ function endGame() {
 }
 
 function restartGame() {
-    
-    location.reload();
+ index = 0;
+ location.reload();
 }
 </script>
 
