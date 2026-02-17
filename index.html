@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Doğruyu Bul</title>
+
+<style>
+body {
+    background-color: #eaf6ff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.container {
+    max-width: 420px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+img {
+    width: 100%;
+    border-radius: 15px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+button {
+    width: 120px;
+    height: 120px;
+    font-size: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.true {
+    background-color: #4CAF50;
+}
+
+.false {
+    background-color: #f44336;
+}
+
+#feedback {
+    font-size: 50px;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <img id="image" src="img1.jpg">
+
+    <div class="buttons">
+        <button class="true" onclick="check(true)">😊</button>
+        <button class="false" onclick="check(false)">😟</button>
+    </div>
+
+    <div id="feedback"></div>
+
+</div>
+
+<!-- 🔊 SESLER (BODY İÇİNDE OLMALI) -->
+<audio id="soundCorrect" src="alkis.mp3"></audio>
+<audio id="soundWrong" src="dusun.mp3"></audio>
+
+<script>
+const scenes = [
+    true, false, true, false, true,
+    true, true, false, true, false
+];
+
+let index = 0;
+
+const feedback = document.getElementById("feedback");
+const correctSound = document.getElementById("soundCorrect");
+const wrongSound = document.getElementById("soundWrong");
+
+function check(choice) {
+
+    if (choice === scenes[index]) {
+        feedback.textContent = "👏";
+        correctSound.currentTime = 0;
+        correctSound.play();
+    } else {
+        feedback.textContent = "🤔";
+        wrongSound.currentTime = 0;
+        wrongSound.play();
+    }
+
+    setTimeout(() => {
+        feedback.textContent = "";
+        index++;
+
+        if (index < scenes.length) {
+            document.getElementById("image").src = `img${index + 1}.jpg`;
+        } else {
+            endGame();
+        }
+    }, 1200);
+}
+
+function endGame() {
+    document.querySelector(".container").innerHTML = `
+        <h2>🎉 Harika!</h2>
+        <p>Hepsini düşündün</p>
+        <button onclick="restartGame()" style="font-size:18px;">
+            🔄 Baştan Oyna
+        </button>
+    `;
+}
+
+function restartGame() {
+    location.reload();
+}
+</script>
+
+</body>
+</html>
