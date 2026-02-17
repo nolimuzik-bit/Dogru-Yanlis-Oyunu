@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doğruyu Bul</title>
-
 <style>
 body {
     background-color: #eaf6ff;
@@ -16,7 +15,7 @@ body {
 
 .container {
     max-width: 420px;
-    margin: 40px auto;
+    margin: auto;
     background: white;
     padding: 20px;
     border-radius: 20px;
@@ -42,8 +41,13 @@ button {
     cursor: pointer;
 }
 
-.true { background-color: #4CAF50; }
-.false { background-color: #f44336; }
+.true {
+    background-color: #4CAF50;
+}
+
+.false {
+    background-color: #f44336;
+}
 
 #feedback {
     font-size: 50px;
@@ -51,27 +55,11 @@ button {
 }
 </style>
 </head>
-
 <body>
 
-<!-- BAŞLANGIÇ EKRANI -->
-<div id="startScreen" class="container">
-    <h2>👋 Yetişkinler için</h2>
-    <p>
-        Çocuğunuza resmi gösterin ve<br>
-        <strong>“Sence bu davranış doğru mu?”</strong> diye sorun.<br><br>
-        😊 Doğruysa yeşil butona<br>
-        😟 Yanlışsa kırmızı butona basmasını isteyin.
-    </p>
-    <button onclick="startGame()" style="font-size:20px; padding:10px 20px;">
-        ▶️ Başla
-    </button>
-</div>
-
-<!-- OYUN EKRANI -->
-<div id="gameScreen" class="container" style="display:none;">
+<div class="container">
     <img id="image" src="img1.jpg">
-
+    
     <div class="buttons">
         <button class="true" onclick="check(true)">😊</button>
         <button class="false" onclick="check(false)">😟</button>
@@ -80,106 +68,96 @@ button {
     <div id="feedback"></div>
 </div>
 
-<!-- SESLER -->
+<!-- Sesler -->
 <audio id="soundCorrect" src="alkis.mp3"></audio>
 <audio id="soundWrong" src="dusun.mp3"></audio>
 
 <script>
-const scenes = [
-    true, false, true, false, true,
-    true, true, false, true, true
-];
+document.addEventListener("DOMContentLoaded", function() {
+    const scenes = [
+        true, false, true, false, true,
+        true, true, false, true, true
+    ];
 
-let index = 0;
-let correctCount = 0;
+    let index = 0;
+    let correctCount = 0;
 
-const feedback = document.getElementById("feedback");
-const correctSound = document.getElementById("soundCorrect");
-const wrongSound = document.getElementById("soundWrong");
+    const feedback = document.getElementById("feedback");
+    const correctSound = document.getElementById("soundCorrect");
+    const wrongSound = document.getElementById("soundWrong");
 
-function check(choice) {
-    if (choice === scenes[index]) {
-        feedback.textContent = "👏";
-        if (correctSound) {
-            correctSound.currentTime = 0;
-            correctSound.play();
-        }
-        correctCount++;
-    } else {
-        feedback.textContent = "🤔";
-        if (wrongSound) {
-            wrongSound.currentTime = 0;
-            wrongSound.play();
-        }
-    }
-
-    setTimeout(() => {
-        feedback.textContent = "";
-        index++;
-        if (index < scenes.length) {
-            document.getElementById("image").src = `img${index + 1}.jpg`;
+    function check(choice) {
+        if (choice === scenes[index]) {
+            feedback.textContent = "👏";
+            if (correctSound) { correctSound.currentTime = 0; correctSound.play(); }
+            correctCount++;
         } else {
-            endGame();
+            feedback.textContent = "🤔";
+            if (wrongSound) { wrongSound.currentTime = 0; wrongSound.play(); }
         }
-    }, 1200);
-}
 
-function endGame() {
-    const ratio = correctCount / scenes.length;
-    const container = document.querySelector(".container");
-    const image = container.querySelector("#image");
-    const buttons = container.querySelector(".buttons");
-
-    // Resim ve butonları gizle
-    image.style.display = "none";
-    buttons.style.display = "none";
-
-    // Feedback alanını temizle
-    feedback.textContent = "";
-
-    // Bitiş mesajı
-    const message = document.createElement("div");
-    message.id = "endMessage";
-
-    if (ratio >= 0.6) {
-        message.innerHTML = `
-            <h2>🎉🎉 BRAVO 🎉🎉</h2>
-            <p>Harika düşündün!</p>
-            <p>👏👏👏</p>
-            <button onclick="restartGame()" style="font-size:18px;">🔄 Yeniden Oyna</button>
-        `;
-    } else {
-        message.innerHTML = `
-            <h2>🌱 Güzel denedin</h2>
-            <p>Birlikte tekrar deneyelim mi?</p>
-            <button onclick="restartGame()" style="font-size:18px;">🔄 Tekrar Dene</button>
-        `;
+        setTimeout(() => {
+            feedback.textContent = "";
+            index++;
+            if (index < scenes.length) {
+                document.getElementById("image").src = `img${index + 1}.jpg`;
+            } else {
+                endGame();
+            }
+        }, 1200);
     }
 
-    container.appendChild(message);
-}
+    function endGame() {
+        const ratio = correctCount / scenes.length;
+        const container = document.querySelector(".container");
+        const image = container.querySelector("#image");
+        const buttons = container.querySelector(".buttons");
 
-function restartGame() {
-    const container = document.querySelector(".container");
+        // Resim ve butonları gizle
+        image.style.display = "none";
+        buttons.style.display = "none";
+        feedback.textContent = "";
 
-    // Bitiş mesajını kaldır
-    const endMessage = document.getElementById("endMessage");
-    if (endMessage) {
-        container.removeChild(endMessage);
+        const message = document.createElement("div");
+        message.id = "endMessage";
+
+        if (ratio >= 0.6) {
+            message.innerHTML = `
+                <h2>🎉🎉 BRAVO 🎉🎉</h2>
+                <p>Harika düşündün!</p>
+                <p>👏👏👏</p>
+                <button onclick="restartGame()" style="font-size:18px;">🔄 Yeniden Oyna</button>
+            `;
+        } else {
+            message.innerHTML = `
+                <h2>🌱 Güzel denedin</h2>
+                <p>Birlikte tekrar deneyelim mi?</p>
+                <button onclick="restartGame()" style="font-size:18px;">🔄 Tekrar Dene</button>
+            `;
+        }
+
+        container.appendChild(message);
     }
 
-    // Resim ve butonları geri göster
-    container.querySelector("#image").style.display = "block";
-    container.querySelector(".buttons").style.display = "flex";
+    function restartGame() {
+        const container = document.querySelector(".container");
 
-    // İlk resmi ve sayaçları sıfırla
-    document.getElementById("image").src = "img1.jpg";
-    index = 0;
-    correctCount = 0;
+        const endMessage = document.getElementById("endMessage");
+        if (endMessage) container.removeChild(endMessage);
 
-    // Feedback alanını temizle
-    feedback.textContent = "";
-}
+        container.querySelector("#image").style.display = "block";
+        container.querySelector(".buttons").style.display = "flex";
+
+        document.getElementById("image").src = "img1.jpg";
+        index = 0;
+        correctCount = 0;
+        feedback.textContent = "";
+    }
+
+    // Fonksiyonları global yap
+    window.check = check;
+    window.restartGame = restartGame;
+});
 </script>
 
 </body>
