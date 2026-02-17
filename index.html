@@ -91,7 +91,7 @@ const scenes = [
 ];
 
 let index = 0;
-
+let correctCount = 0;
 function startGame() {
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "block";
@@ -110,6 +110,8 @@ function check(choice) {
         feedback.textContent = "🤔";
         wrongSound.currentTime = 0;
         wrongSound.play();
+        correctCount++;
+
     }
 
     setTimeout(() => {
@@ -125,17 +127,31 @@ function check(choice) {
 }
 
 function endGame() {
-    document.getElementById("gameScreen").innerHTML = `
-        <h2>🎉 Oyun Bitti</h2>
-        <p>Teşekkürler</p>
-        <button onclick="restartGame()" style="font-size:18px;">
-            🔄 Baştan Oyna
-        </button>
-    `;
+    const total = scenes.length;
+    const ratio = correctCount / total;
+
+    if (ratio >= 0.6) {
+        document.querySelector(".container").innerHTML = `
+            <h2>🎉🎉 BRAVO 🎉🎉</h2>
+            <p>Harika düşündün!</p>
+            <p>👏👏👏</p>
+            <button onclick="restartGame()" style="font-size:18px;">
+                🔄 Yeniden Oyna
+            </button>
+        `;
+    } else {
+        document.querySelector(".container").innerHTML = `
+            <h2>🌱 Güzel denedin</h2>
+            <p>Birlikte tekrar deneyelim mi?</p>
+            <button onclick="restartGame()" style="font-size:18px;">
+                🔄 Tekrar Dene
+            </button>
+        `;
+    }
 }
 
 function restartGame() {
-    index = 0;
+    
     location.reload();
 }
 </script>
