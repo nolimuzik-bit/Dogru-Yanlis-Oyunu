@@ -10,19 +10,7 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
 }
-<div id="startScreen" class="container">
-    <h2>👋 Yetişkinler için</h2>
-    <p>
-        Çocuğunuza resmi gösterin ve<br>
-        <strong>“Sence bu davranış doğru mu?”</strong> diye sorun.<br><br>
-        😊 Doğruysa yeşil butona<br>
-        😟 Yanlışsa kırmızı butona basmasını isteyin.
-    </p>
 
-    <button onclick="startGame()" style="font-size:20px; padding:10px 20px;">
-        ▶️ Başla
-    </button>
-</div>
 
 .container {
     max-width: 420px;
@@ -148,6 +136,19 @@ function restartGame() {
 function startGame() {
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "block";
+    <div id="startScreen" class="container">
+    <h2>👋 Yetişkinler için</h2>
+    <p>
+        Çocuğunuza resmi gösterin ve<br>
+        <strong>“Sence bu davranış doğru mu?”</strong> diye sorun.<br><br>
+        😊 Doğruysa yeşil butona<br>
+        😟 Yanlışsa kırmızı butona basmasını isteyin.
+    </p>
+
+    <button onclick="startGame()" style="font-size:20px; padding:10px 20px;">
+        ▶️ Başla
+    </button>
+</div>
 </script>
 
 </body>
