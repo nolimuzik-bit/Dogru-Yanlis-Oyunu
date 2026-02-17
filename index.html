@@ -87,38 +87,35 @@ button {
 <script>
 const scenes = [
     true, false, true, false, true,
-    true, true, false, true, false
+    true, true, false, true, true
 ];
 
 let index = 0;
 let correctCount = 0;
-function startGame() {
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("gameScreen").style.display = "block";
-}
+
+const feedback = document.getElementById("feedback");
+const correctSound = document.getElementById("soundCorrect");
+const wrongSound = document.getElementById("soundWrong");
 
 function check(choice) {
-    const feedback = document.getElementById("feedback");
-    const correctSound = document.getElementById("soundCorrect");
-    const wrongSound = document.getElementById("soundWrong");
-
     if (choice === scenes[index]) {
         feedback.textContent = "👏";
-        correctSound.currentTime = 0;
-        correctSound.play();
+        if (correctSound) {
+            correctSound.currentTime = 0;
+            correctSound.play();
+        }
         correctCount++;
     } else {
         feedback.textContent = "🤔";
-        wrongSound.currentTime = 0;
-        wrongSound.play();
-        correctCount++;
-
+        if (wrongSound) {
+            wrongSound.currentTime = 0;
+            wrongSound.play();
+        }
     }
 
     setTimeout(() => {
         feedback.textContent = "";
         index++;
-
         if (index < scenes.length) {
             document.getElementById("image").src = `img${index + 1}.jpg`;
         } else {
@@ -128,54 +125,61 @@ function check(choice) {
 }
 
 function endGame() {
-    const total = scenes.length;
-    const ratio = correctCount / total;
-
+    const ratio = correctCount / scenes.length;
     const container = document.querySelector(".container");
+    const image = container.querySelector("#image");
+    const buttons = container.querySelector(".buttons");
 
     // Resim ve butonları gizle
-    container.querySelector("#image").style.display = "none";
-    container.querySelector(".buttons").style.display = "flex";
-    container.querySelector(".buttons").style.display = "none";
+    image.style.display = "none";
+    buttons.style.display = "none";
+
+    // Feedback alanını temizle
+    feedback.textContent = "";
+
+    // Bitiş mesajı
+    const message = document.createElement("div");
+    message.id = "endMessage";
 
     if (ratio >= 0.6) {
-        container.innerHTML += `
+        message.innerHTML = `
             <h2>🎉🎉 BRAVO 🎉🎉</h2>
             <p>Harika düşündün!</p>
             <p>👏👏👏</p>
-            <button onclick="restartGame()" style="font-size:18px;">
-                🔄 Yeniden Oyna
-            </button>
+            <button onclick="restartGame()" style="font-size:18px;">🔄 Yeniden Oyna</button>
         `;
     } else {
-        container.innerHTML += `
+        message.innerHTML = `
             <h2>🌱 Güzel denedin</h2>
             <p>Birlikte tekrar deneyelim mi?</p>
-            <button onclick="restartGame()" style="font-size:18px;">
-                🔄 Tekrar Dene
-            </button>
+            <button onclick="restartGame()" style="font-size:18px;">🔄 Tekrar Dene</button>
         `;
     }
+
+    container.appendChild(message);
 }
 
 function restartGame() {
-    // Sayaçları sıfırla
-    index = 0;
-    correctCount = 0;
-
     const container = document.querySelector(".container");
+
+    // Bitiş mesajını kaldır
+    const endMessage = document.getElementById("endMessage");
+    if (endMessage) {
+        container.removeChild(endMessage);
+    }
 
     // Resim ve butonları geri göster
     container.querySelector("#image").style.display = "block";
     container.querySelector(".buttons").style.display = "flex";
 
-    // İlk resmi göster
+    // İlk resmi ve sayaçları sıfırla
     document.getElementById("image").src = "img1.jpg";
+    index = 0;
+    correctCount = 0;
 
     // Feedback alanını temizle
-    document.getElementById("feedback").textContent = "";
+    feedback.textContent = "";
 }
-
 </script>
 
 </body>
