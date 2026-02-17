@@ -11,6 +11,8 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
+    position: relative;
+    overflow-x: hidden;
 }
 
 .container {
@@ -19,6 +21,7 @@ body {
     background: white;
     padding: 20px;
     border-radius: 20px;
+    position: relative;
 }
 
 img {
@@ -41,17 +44,26 @@ button {
     cursor: pointer;
 }
 
-.true {
-    background-color: #4CAF50;
-}
-
-.false {
-    background-color: #f44336;
-}
+.true { background-color: #4CAF50; }
+.false { background-color: #f44336; }
 
 #feedback {
     font-size: 50px;
     margin-top: 15px;
+}
+
+/* Konfeti animasyonu */
+@keyframes confetti {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(300px) rotate(360deg); opacity: 0; }
+}
+.confetti {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    top: 0;
+    animation: confetti 1.5s linear forwards;
 }
 </style>
 </head>
@@ -107,6 +119,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 1200);
     }
 
+    function createConfetti() {
+        for (let i = 0; i < 25; i++) {
+            const confetti = document.createElement("div");
+            confetti.className = "confetti";
+            confetti.style.left = Math.random() * 100 + "%";
+            confetti.style.backgroundColor = ["red","blue","green","yellow","pink"][Math.floor(Math.random()*5)];
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 2000);
+        }
+    }
+
     function endGame() {
         const ratio = correctCount / scenes.length;
         const container = document.querySelector(".container");
@@ -122,6 +145,8 @@ document.addEventListener("DOMContentLoaded", function() {
         message.id = "endMessage";
 
         if (ratio >= 0.6) {
+            createConfetti(); // Konfeti animasyonu
+            if (correctSound) { correctSound.currentTime = 0; correctSound.play(); }
             message.innerHTML = `
                 <h2>🎉🎉 BRAVO 🎉🎉</h2>
                 <p>Harika düşündün!</p>
@@ -141,7 +166,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function restartGame() {
         const container = document.querySelector(".container");
-
         const endMessage = document.getElementById("endMessage");
         if (endMessage) container.removeChild(endMessage);
 
