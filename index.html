@@ -39,8 +39,8 @@ button {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    padding: 12px 16px;
-    font-size: 16px;
+    padding: 14px 20px;
+    font-size: 18px;
 }
 
 .big-btn {
@@ -58,23 +58,24 @@ button {
     margin-top: 15px;
 }
 
-/* BAŞLANGIÇ EKRANI */
+/* BAŞLANGIÇ */
 .start {
-    margin-top: 20px;
+    background: linear-gradient(180deg,#dff5ea,#f4fffa);
+    border-radius: 20px;
+    padding: 30px 20px;
 }
 
 .start h2 {
-    color:#2196f3;
+    color:#2e7d6b;
     font-size: 26px;
     margin-bottom: 15px;
 }
 
 .start .card {
-    background: #f0f8ff;
+    background: rgba(255,255,255,0.9);
     border-radius: 16px;
     padding: 18px;
     margin: 20px 0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .start p {
@@ -89,14 +90,33 @@ button {
 
 .start .start-btn {
     margin-top: 25px;
-    font-size: 22px;
-    padding: 14px 28px;
-    background: #2196f3;
+    font-size: 24px;
+    padding: 16px 32px;
+    background: #ff9800;
     color: white;
-    border-radius: 30px;
+    border-radius: 35px;
 }
 
-/* video */
+/* KONFETİ */
+.confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+.confetti span {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: red;
+    animation: fall 3s linear infinite;
+}
+@keyframes fall {
+    0% { transform: translateY(-10px) rotate(0); }
+    100% { transform: translateY(100vh) rotate(360deg); }
+}
+
+/* VIDEO */
 .video-overlay {
     position: fixed;
     inset: 0;
@@ -111,14 +131,12 @@ button {
 
 <body>
 
-<!-- 🔊 SESLER -->
 <audio id="clapSound" src="alkis.mp3"></audio>
 <audio id="wrongSound" src="dusun.mp3"></audio>
 <audio id="dingSound" src="ding.mp3"></audio>
 
 <div class="container" id="app">
 
-    <!-- BAŞLANGIÇ -->
     <div class="start" id="startScreen">
         <h2>👋 Yetişkinler için</h2>
 
@@ -128,19 +146,15 @@ button {
                 <strong>“Sence bu davranış doğru mu?”</strong><br>
                 diye sorun.
             </p>
-
             <div class="icons">
                 😊 Doğruysa <strong>yeşil</strong><br>
                 😟 Yanlışsa <strong>kırmızı</strong>
             </div>
         </div>
 
-        <button class="start-btn" onclick="startGame()">
-            ▶️ Oyuna Başla
-        </button>
+        <button class="start-btn" onclick="startGame()">▶️ Oyuna Başla</button>
     </div>
 
-    <!-- OYUN -->
     <div id="gameScreen" style="display:none;">
         <img id="image" src="img1.jpg">
         <div class="buttons">
@@ -155,20 +169,18 @@ button {
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-const scenes = [true,false,true,false,true,true,true,false,true,false];
-let index = 0;
-let correctCount = 0;
-let audioUnlocked = false;
+const scenes=[true,false,true,false,true,true,true,false,true,false];
+let index=0, correctCount=0, audioUnlocked=false;
 
-const clapSound = document.getElementById("clapSound");
-const wrongSound = document.getElementById("wrongSound");
-const dingSound  = document.getElementById("dingSound");
-const feedback = document.getElementById("feedback");
-const image = document.getElementById("image");
+const clapSound=document.getElementById("clapSound");
+const wrongSound=document.getElementById("wrongSound");
+const dingSound=document.getElementById("dingSound");
+const feedback=document.getElementById("feedback");
+const image=document.getElementById("image");
 
 function unlockAudio(){
     if(audioUnlocked) return;
-    audioUnlocked = true;
+    audioUnlocked=true;
     [clapSound,wrongSound,dingSound].forEach(s=>{
         s.play().then(()=>{s.pause();s.currentTime=0;}).catch(()=>{});
     });
@@ -177,92 +189,74 @@ function unlockAudio(){
 function startGame(){
     unlockAudio();
     dingSound.play();
-    document.getElementById("startScreen").style.display="none";
-    document.getElementById("gameScreen").style.display="block";
+    startScreen.style.display="none";
+    gameScreen.style.display="block";
 }
 
 function check(choice){
     unlockAudio();
-
-    if(choice === scenes[index]){
+    if(choice===scenes[index]){
         feedback.textContent="👏";
-        clapSound.currentTime=0;
         clapSound.play();
         correctCount++;
     }else{
         feedback.textContent="🤔";
-        wrongSound.currentTime=0;
         wrongSound.play();
     }
-
     setTimeout(()=>{
         feedback.textContent="";
         index++;
-        if(index < scenes.length){
+        if(index<scenes.length){
             image.src=`img${index+1}.jpg`;
-        }else{
-            endGame();
-        }
+        }else endGame();
     },1200);
 }
 
 function endGame(){
-    const app = document.getElementById("app");
-    const ratio = correctCount / scenes.length;
+    const app=document.getElementById("app");
+    const ratio=correctCount/scenes.length;
+    app.innerHTML="";
 
-    app.innerHTML = "";
-
-    if(ratio >= 0.6){
-        app.innerHTML = `
+    if(ratio>=0.6){
+        createConfetti();
+        app.innerHTML=`
             <h2>🎉 AFERİN 🎉</h2>
             <p>Harika düşündün!</p>
-            <p>👏👏👏</p>
-            <div style="display:flex;justify-content:space-around;margin-top:20px;">
-                <button onclick="showVideo()">▶️ Video İzle</button>
-                <button onclick="restartGame()">🔄 Tekrar Oyna</button>
-            </div>
-        `;
+            <div style="display:flex;justify-content:space-around;margin-top:30px;">
+                <button style="font-size:22px;" onclick="showVideo()">▶️ Video İzle</button>
+                <button style="font-size:22px;" onclick="restartGame()">🔄 Tekrar Oyna</button>
+            </div>`;
         clapSound.play();
     }else{
-        app.innerHTML = `
+        app.innerHTML=`
             <h2>🌱 Güzel denedin</h2>
-            <p>
-                Biraz daha denersen<br>
-                <strong>video sürprizi</strong> seni bekliyor 🎁
-            </p>
-            <div style="margin-top:20px;">
-                <button onclick="restartGame()">🔄 Tekrar Dene</button>
-            </div>
-        `;
+            <p>Biraz daha denersen <strong>video sürprizi</strong> var 🎁</p>
+            <button style="font-size:22px;" onclick="restartGame()">🔄 Tekrar Dene</button>`;
     }
 }
 
+function createConfetti(){
+    const c=document.createElement("div");
+    c.className="confetti";
+    for(let i=0;i<80;i++){
+        const s=document.createElement("span");
+        s.style.left=Math.random()*100+"%";
+        s.style.background=`hsl(${Math.random()*360},80%,60%)`;
+        s.style.animationDelay=Math.random()*3+"s";
+        c.appendChild(s);
+    }
+    document.body.appendChild(c);
+}
+
 function showVideo(){
-    const overlay=document.createElement("div");
-    overlay.className="video-overlay";
-    overlay.innerHTML=`<div id="ytplayer"></div>`;
-    document.body.appendChild(overlay);
-
-    const VIDEO_ID = "QEubvr-ji74"; // 👈 SADECE BURAYI DEĞİŞTİR
-
-    new YT.Player("ytplayer",{
-        videoId:VIDEO_ID,
-        events:{
-            onReady:e=>e.target.playVideo(),
-            onStateChange:e=>{
-                if(e.data===YT.PlayerState.ENDED){
-                    document.body.removeChild(overlay);
-                }
-            }
-        }
-    });
+    const o=document.createElement("div");
+    o.className="video-overlay";
+    o.innerHTML=`<div id="ytplayer"></div>`;
+    document.body.appendChild(o);
+    new YT.Player("ytplayer",{videoId:"QEubvr-ji74"});
 }
 
-function restartGame(){
-    index=0;
-    correctCount=0;
-    location.reload();
-}
+function restartGame(){ location.reload(); }
 </script>
 
 </body>
