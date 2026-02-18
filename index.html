@@ -119,8 +119,7 @@ button {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    animation-name: fall, sway, spin;
-    animation-timing-function: linear;
+    animation: fall linear, sway ease-in-out, spin linear;
 }
 
 @keyframes fall {
@@ -130,7 +129,9 @@ button {
 
 @keyframes sway {
     0% { transform: translateX(0); }
-    50% { transform: translateX(calc(10px - 20px * var(--random))); }
+    25% { transform: translateX(calc(15px * var(--direction))); }
+    50% { transform: translateX(calc(-15px * var(--direction))); }
+    75% { transform: translateX(calc(15px * var(--direction))); }
     100% { transform: translateX(0); }
 }
 
@@ -143,7 +144,6 @@ button {
 
 <body>
 
-<!-- 🔊 SESLER -->
 <audio id="clapSound" src="alkis.mp3"></audio>
 <audio id="wrongSound" src="dusun.mp3"></audio>
 <audio id="dingSound" src="ding.mp3"></audio>
@@ -238,7 +238,6 @@ function endGame(){
     app.innerHTML = "";
 
     if(ratio >= 0.6){
-        // konfeti ekle
         const confettiContainer = document.createElement("div");
         confettiContainer.id = "confetti-container";
         app.appendChild(confettiContainer);
@@ -284,7 +283,7 @@ function startConfetti(container){
         confetti.style.animationDelay =
             (Math.random() * 2) + "s";
 
-        confetti.style.setProperty('--random', Math.random());
+        confetti.style.setProperty('--direction', Math.random() < 0.5 ? 1 : -1);
 
         container.appendChild(confetti);
         setTimeout(() => confetti.remove(), 8000);
@@ -323,3 +322,4 @@ function restartGame(){
 
 </body>
 </html>
+
