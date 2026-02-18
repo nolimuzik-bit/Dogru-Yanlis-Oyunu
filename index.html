@@ -38,12 +38,18 @@ img {
 }
 
 button {
+    padding: 12px 16px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.choice-btn {
     width: 120px;
     height: 120px;
     font-size: 40px;
-    border: none;
     border-radius: 50%;
-    cursor: pointer;
 }
 
 .true { background-color: #4CAF50; }
@@ -72,12 +78,23 @@ button {
 <audio id="clapSound" src="alkis.mp3"></audio>
 <audio id="wrongSound" src="dusun.mp3"></audio>
 
-<div class="container">
+<div class="container" id="startScreen">
+    <h2>👨‍👩‍👧 Büyükler İçin</h2>
+    <p style="text-align:left;">
+        • Çocuğa resmi gösterin.<br>
+        • Doğru olduğunu düşünüyorsa 😊<br>
+        • Yanlış olduğunu düşünüyorsa 😟 butonuna basmasını isteyin.<br>
+        • Amaç doğru–yanlış ayırt etmeyi eğlenceli şekilde desteklemektir.
+    </p>
+    <button onclick="startGame()">▶️ Oyuna Başla</button>
+</div>
+
+<div class="container" id="gameScreen" style="display:none;">
     <img id="image" src="img1.jpg">
 
     <div class="buttons">
-        <button class="true" onclick="check(true)">😊</button>
-        <button class="false" onclick="check(false)">😟</button>
+        <button class="choice-btn true" onclick="check(true)">😊</button>
+        <button class="choice-btn false" onclick="check(false)">😟</button>
     </div>
 
     <div id="feedback"></div>
@@ -94,26 +111,27 @@ let audioUnlocked = false;
 const feedback = document.getElementById("feedback");
 const clapSound = document.getElementById("clapSound");
 const wrongSound = document.getElementById("wrongSound");
+const image = document.getElementById("image");
 
-// 🔓 SES KİLİDİ AÇ
+// 🔓 SES KİLİDİ
 function unlockAudio() {
     if (audioUnlocked) return;
     audioUnlocked = true;
 
-    clapSound.play().then(()=>{
-        clapSound.pause();
-        clapSound.currentTime = 0;
-    }).catch(()=>{});
-
-    wrongSound.play().then(()=>{
-        wrongSound.pause();
-        wrongSound.currentTime = 0;
-    }).catch(()=>{});
+    clapSound.play().then(()=>{ clapSound.pause(); clapSound.currentTime=0; }).catch(()=>{});
+    wrongSound.play().then(()=>{ wrongSound.pause(); wrongSound.currentTime=0; }).catch(()=>{});
 }
 
-// Cevap kontrol
+// ▶️ OYUN BAŞLAT
+function startGame() {
+    unlockAudio();
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "flex";
+}
+
+// CEVAP KONTROL
 function check(choice) {
-    unlockAudio(); // 👈 ÇOK ÖNEMLİ
+    unlockAudio();
 
     if (choice === scenes[index]) {
         feedback.textContent = "👏";
@@ -137,15 +155,13 @@ function check(choice) {
     }, 1200);
 }
 
-// Oyun sonu
+// OYUN SONU
 function endGame() {
-    const container = document.querySelector(".container");
     image.style.display = "none";
     document.querySelector(".buttons").style.display = "none";
 
     const msg = document.createElement("div");
     msg.id = "endMessage";
-
     msg.innerHTML = `
         <h2>🎉 Oyun Bitti 🎉</h2>
         <div style="display:flex; justify-content:space-around; margin-top:20px;">
@@ -153,7 +169,7 @@ function endGame() {
             <button onclick="restartGame()">🔄 Tekrar Oyna</button>
         </div>
     `;
-    container.appendChild(msg);
+    document.getElementById("gameScreen").appendChild(msg);
 
     document.getElementById("watchVideoBtn").onclick = showVideo;
 }
@@ -180,7 +196,7 @@ function showVideo() {
     });
 }
 
-// Tekrar
+// 🔄 TEKRAR
 function restartGame() {
     index = 0;
     correctCount = 0;
