@@ -46,46 +46,35 @@ button {
     cursor: pointer;
 }
 
-.true {
-    background-color: #4CAF50;
-}
-
-.false {
-    background-color: #f44336;
-}
+.true { background-color: #4CAF50; }
+.false { background-color: #f44336; }
 
 #feedback {
     font-size: 50px;
     margin-top: 15px;
 }
 
-/* Video overlay için */
 .video-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.8);
+    inset: 0;
+    background: rgba(0,0,0,0.8);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-}
-.video-overlay iframe {
-    width: 90%;
-    max-width: 560px;
-    height: 50%;
-    max-height: 315px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- 🔊 SESLER -->
+<audio id="clapSound" src="clap.mp3"></audio>
+<audio id="wrongSound" src="wrong.mp3"></audio>
+
 <div class="container">
     <img id="image" src="img1.jpg">
-    
+
     <div class="buttons">
         <button class="true" onclick="check(true)">😊</button>
         <button class="false" onclick="check(false)">😟</button>
@@ -94,130 +83,111 @@ button {
     <div id="feedback"></div>
 </div>
 
-<!-- YouTube Player API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-// Oyun verileri
-const scenes = [true, false, true, false, true, true, true, false, true, false];
+const scenes = [true,false,true,false,true,true,true,false,true,false];
 let index = 0;
 let correctCount = 0;
+let audioUnlocked = false;
 
 const feedback = document.getElementById("feedback");
+const clapSound = document.getElementById("clapSound");
+const wrongSound = document.getElementById("wrongSound");
 
-// Cevabı kontrol et
+// 🔓 SES KİLİDİ AÇ
+function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+
+    clapSound.play().then(()=>{
+        clapSound.pause();
+        clapSound.currentTime = 0;
+    }).catch(()=>{});
+
+    wrongSound.play().then(()=>{
+        wrongSound.pause();
+        wrongSound.currentTime = 0;
+    }).catch(()=>{});
+}
+
+// Cevap kontrol
 function check(choice) {
+    unlockAudio(); // 👈 ÇOK ÖNEMLİ
+
     if (choice === scenes[index]) {
         feedback.textContent = "👏";
+        clapSound.currentTime = 0;
+        clapSound.play();
         correctCount++;
     } else {
         feedback.textContent = "🤔";
+        wrongSound.currentTime = 0;
+        wrongSound.play();
     }
 
     setTimeout(() => {
         feedback.textContent = "";
         index++;
         if (index < scenes.length) {
-            document.getElementById("image").src = `img${index + 1}.jpg`;
+            image.src = `img${index+1}.jpg`;
         } else {
             endGame();
         }
     }, 1200);
 }
 
-// Oyun bittiğinde mesaj + Video İzle + Tekrar Oyna
+// Oyun sonu
 function endGame() {
     const container = document.querySelector(".container");
-    const image = container.querySelector("#image");
-    const buttons = container.querySelector(".buttons");
-
-    // Resim ve seçim butonlarını gizle
     image.style.display = "none";
-    buttons.style.display = "none";
-    feedback.textContent = "";
+    document.querySelector(".buttons").style.display = "none";
 
-    const message = document.createElement("div");
-    message.id = "endMessage";
+    const msg = document.createElement("div");
+    msg.id = "endMessage";
 
-    const total = scenes.length;
-    const ratio = correctCount / total;
-
-    if (ratio >= 0.6) {
-        message.innerHTML = `
-            <h2>🎉🎉 BRAVO 🎉🎉</h2>
-            <p>Harika düşündün!</p>
-            <p>👏👏👏</p>
-        `;
-    } else {
-        message.innerHTML = `
-            <h2>🌱 Güzel denedin</h2>
-            <p>Birlikte tekrar deneyelim mi?</p>
-        `;
-    }
-
-    // Butonlar: Video İzle + Tekrar Oyna
-    message.innerHTML += `
-        <div style="margin-top:20px; display:flex; justify-content:space-around;">
-            <button id="watchVideoBtn" style="font-size:16px; padding:8px 12px;">▶️ Video İzle</button>
-            <button onclick="restartGame()" style="font-size:16px; padding:8px 12px;">🔄 Tekrar Oyna</button>
+    msg.innerHTML = `
+        <h2>🎉 Oyun Bitti 🎉</h2>
+        <div style="display:flex; justify-content:space-around; margin-top:20px;">
+            <button id="watchVideoBtn">▶️ Video İzle</button>
+            <button onclick="restartGame()">🔄 Tekrar Oyna</button>
         </div>
     `;
+    container.appendChild(msg);
 
-    container.appendChild(message);
+    document.getElementById("watchVideoBtn").onclick = showVideo;
+}
 
-    // Video butonuna tıklanınca YouTube videoyu göster
-    document.getElementById("watchVideoBtn").addEventListener("click", () => {
-        const videoOverlay = document.createElement("div");
-        videoOverlay.className = "video-overlay";
+// 🎥 VIDEO
+function showVideo() {
+    const overlay = document.createElement("div");
+    overlay.className = "video-overlay";
+    overlay.innerHTML = `<div id="ytplayer"></div>`;
+    document.body.appendChild(overlay);
 
-        const iframe = document.createElement("div");
-        iframe.id = "ytplayer";
-        videoOverlay.appendChild(iframe);
+    const VIDEO_ID = "QEubvr-ji74"; // 👈 SADECE BURAYI DEĞİŞTİR
 
-        document.body.appendChild(videoOverlay);
-
-        
-        const VIDEO_ID = "QEubvr-ji74";
-
-        // YouTube player oluştur
-        const player = new YT.Player('ytplayer', {
-            height: '315',
-            width: '560',
-            videoId: VIDEO_ID,
-            events: {
-                'onReady': (event) => { event.target.playVideo(); },
-                'onStateChange': (event) => {
-                    // Video bittiğinde overlayi kapat
-                    if (event.data === YT.PlayerState.ENDED) {
-                        document.body.removeChild(videoOverlay);
-                    }
+    new YT.Player("ytplayer", {
+        videoId: VIDEO_ID,
+        events: {
+            onReady: e => e.target.playVideo(),
+            onStateChange: e => {
+                if (e.data === YT.PlayerState.ENDED) {
+                    document.body.removeChild(overlay);
                 }
             }
-        });
-
-        // Overlay tıklayınca kapansın
-        videoOverlay.addEventListener("click", (e) => {
-            if (e.target === videoOverlay) {
-                document.body.removeChild(videoOverlay);
-            }
-        });
+        }
     });
 }
 
-// Oyunu yeniden başlat
+// Tekrar
 function restartGame() {
     index = 0;
     correctCount = 0;
-
-    const container = document.querySelector(".container");
-    container.querySelector("#image").style.display = "block";
-    container.querySelector(".buttons").style.display = "flex";
-
-    document.getElementById("image").src = "img1.jpg";
-    feedback.textContent = "";
-
-    const endMessage = document.getElementById("endMessage");
-    if (endMessage) endMessage.remove();
+    image.style.display = "block";
+    document.querySelector(".buttons").style.display = "flex";
+    image.src = "img1.jpg";
+    document.getElementById("endMessage").remove();
 }
 </script>
 
