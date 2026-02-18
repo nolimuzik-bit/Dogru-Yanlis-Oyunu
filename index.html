@@ -4,14 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doğruyu Bul</title>
-
 <style>
 body {
     background: linear-gradient(180deg,#eaf6ff,#ffffff);
     font-family: Arial, sans-serif;
     margin: 0;
-    position: relative;
-    overflow-x: hidden;
 }
 
 .container {
@@ -25,7 +22,6 @@ body {
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    position: relative;
 }
 
 img {
@@ -67,13 +63,12 @@ button {
     background: #ffe6ee; /* açık pembe */
     border-radius: 20px;
     padding: 25px;
-    margin-top: 20px;
 }
 
 .start h2 {
     color:#2196f3;
-    margin-top:-20px;
     font-size:26px;
+    margin-bottom:15px;
 }
 
 .start p {
@@ -81,16 +76,16 @@ button {
     font-size:18px;
 }
 
-.start button {
+.start .start-btn {
     margin-top:25px;
     font-size:22px;
+    padding:14px 30px;
     background:#ff9800;
     color:white;
-    padding:14px 30px;
     border-radius:30px;
 }
 
-/* video */
+/* video overlay */
 .video-overlay {
     position: fixed;
     inset: 0;
@@ -101,49 +96,31 @@ button {
     z-index: 1000;
 }
 
-/* CONFETTI */
-#confetti-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 999;
-}
-
+/* konfeti */
 .confetti {
-    position: absolute;
+    position: fixed;
     top: -10px;
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
+    opacity: 0.8;
+    z-index: 2000;
+    pointer-events: none;
     border-radius: 50%;
-    animation: fall linear, sway ease-in-out, spin linear;
+    animation-name: fall;
+    animation-timing-function: linear;
 }
 
 @keyframes fall {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(100vh); }
-}
-
-@keyframes sway {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(calc(15px * var(--direction))); }
-    50% { transform: translateX(calc(-15px * var(--direction))); }
-    75% { transform: translateX(calc(15px * var(--direction))); }
-    100% { transform: translateX(0); }
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    to {
+        transform: translateY(110vh) rotate(360deg);
+    }
 }
 </style>
 </head>
 
 <body>
 
+<!-- SESLER -->
 <audio id="clapSound" src="alkis.mp3"></audio>
 <audio id="wrongSound" src="dusun.mp3"></audio>
 <audio id="dingSound" src="ding.mp3"></audio>
@@ -159,9 +136,7 @@ button {
             😊 Doğruysa yeşil buton<br>
             😟 Yanlışsa kırmızı buton
         </p>
-        <button onclick="startGame()">
-            ▶️ Başla
-        </button>
+        <button class="start-btn" onclick="startGame()">▶️ Başla</button>
     </div>
 
     <!-- OYUN -->
@@ -208,7 +183,6 @@ function startGame(){
 
 function check(choice){
     unlockAudio();
-
     if(choice === scenes[index]){
         feedback.textContent="👏";
         clapSound.currentTime=0;
@@ -219,7 +193,6 @@ function check(choice){
         wrongSound.currentTime=0;
         wrongSound.play();
     }
-
     setTimeout(()=>{
         feedback.textContent="";
         index++;
@@ -238,11 +211,6 @@ function endGame(){
     app.innerHTML = "";
 
     if(ratio >= 0.6){
-        const confettiContainer = document.createElement("div");
-        confettiContainer.id = "confetti-container";
-        app.appendChild(confettiContainer);
-        startConfetti(confettiContainer);
-
         app.innerHTML = `
             <h2>🎉 AFERİN 🎉</h2>
             <p>Harika düşündün!</p>
@@ -252,6 +220,7 @@ function endGame(){
                 <button onclick="restartGame()" style="font-size:22px;padding:14px 30px;">🔄 Tekrar Oyna</button>
             </div>
         `;
+        startConfetti();
         clapSound.play();
     }else{
         app.innerHTML = `
@@ -261,32 +230,9 @@ function endGame(){
                 <strong>video sürprizi</strong> seni bekliyor 🎁
             </p>
             <div style="margin-top:20px;">
-                <button onclick="restartGame()">🔄 Tekrar Dene</button>
+                <button onclick="restartGame()" style="font-size:20px;padding:12px 28px;">🔄 Tekrar Dene</button>
             </div>
         `;
-    }
-}
-
-function startConfetti(container){
-    for (let i = 0; i < 80; i++) {
-        const confetti = document.createElement("div");
-        confetti.className = "confetti";
-
-        confetti.style.left = Math.random() * 100 + "vw";
-        confetti.style.backgroundColor =
-            ["#ff5252","#ffeb3b","#4caf50","#03a9f4","#e040fb"]
-            [Math.floor(Math.random() * 5)];
-
-        confetti.style.animationDuration =
-            (3 + Math.random() * 4) + "s";
-
-        confetti.style.animationDelay =
-            (Math.random() * 2) + "s";
-
-        confetti.style.setProperty('--direction', Math.random() < 0.5 ? 1 : -1);
-
-        container.appendChild(confetti);
-        setTimeout(() => confetti.remove(), 8000);
     }
 }
 
@@ -317,6 +263,20 @@ function showVideo(){
 
 function restartGame(){
     location.reload();
+}
+
+// Konfeti
+function startConfetti(){
+    for (let i=0;i<80;i++){
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        confetti.style.left = Math.random()*100 + "vw";
+        confetti.style.backgroundColor = ["#ff5252","#ffeb3b","#4caf50","#03a9f4","#e040fb"][Math.floor(Math.random()*5)];
+        confetti.style.animationDuration = (3+Math.random()*3) + "s";
+        confetti.style.animationDelay = (Math.random()*1.5) + "s";
+        document.body.appendChild(confetti);
+        setTimeout(()=>confetti.remove(),7000);
+    }
 }
 </script>
 
