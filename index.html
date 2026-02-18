@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -6,61 +7,64 @@
 <title>Doğruyu Bul</title>
 
 <style>
-body {
-    background-color: #eaf6ff;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 0;
+body{
+    background:#eaf6ff;
+    font-family:Arial,sans-serif;
+    margin:0;
+    text-align:center;
+}
+.container{
+    max-width:420px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+img{width:100%;border-radius:15px}
+.buttons{
+    display:flex;
+    justify-content:space-around;
+    margin-top:20px;
+}
+button{
+    cursor:pointer;
+    border:none;
+}
+.true,.false{
+    width:120px;
+    height:120px;
+    font-size:40px;
+    border-radius:50%;
+}
+.true{background:#4CAF50}
+.false{background:#f44336}
+#feedback{font-size:50px;margin-top:15px}
+
+.start{
+    background:linear-gradient(#ffecd2,#fcb69f);
+}
+.start h2{margin-bottom:10px}
+.start p{font-size:18px;line-height:1.6}
+.start button{
+    font-size:22px;
+    padding:12px 30px;
+    border-radius:30px;
+    background:#ff9800;
+    color:white;
 }
 
-.container {
-    max-width: 420px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-img {
-    width: 100%;
-    border-radius: 15px;
-}
-
-.buttons {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-}
-
-.choice-btn {
-    width: 120px;
-    height: 120px;
-    font-size: 40px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.true { background-color: #4CAF50; }
-.false { background-color: #f44336; }
-
-#feedback {
-    font-size: 50px;
-    margin-top: 15px;
-}
-
-.video-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+.video-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.8);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
 }
 </style>
 </head>
@@ -68,139 +72,98 @@ img {
 <body>
 
 <!-- 🔊 SESLER -->
+<audio id="dingSound" src="ding.mp3"></audio>
 <audio id="clapSound" src="alkis.mp3"></audio>
 <audio id="wrongSound" src="dusun.mp3"></audio>
 
-<div class="container" id="startScreen">
-    <h2>👨‍👩‍👧 Büyükler İçin</h2>
-    <p style="text-align:left;">
-        • Resmi çocuğa gösterin.<br>
-        
-        • Davranış doğruysa 😊, yanlışsa 😟 işaretlemesini isteyin.<br>
-        
-        • Amaç doğru–yanlış davranışı ayırt etmeyi desteklemektir.
+<!-- 🌈 BAŞLANGIÇ -->
+<div class="container start" id="startScreen">
+    <h2>👋 Yetişkinler için</h2>
+    <p>
+        Çocuğunuza resmi gösterin ve<br>
+        <strong>“Sence bu davranış doğru mu?”</strong> diye sorun.<br><br>
+        😊 Doğruysa yeşil buton<br>
+        😟 Yanlışsa kırmızı buton
     </p>
-    <button onclick="startGame()">▶️ Oyuna Başla</button>
+    <button onclick="startGame()">▶️ Başla</button>
 </div>
 
-<div class="container" id="gameScreen" style="display:none;">
+<!-- 🎮 OYUN -->
+<div class="container" id="gameScreen" style="display:none">
     <img id="image" src="img1.jpg">
-
     <div class="buttons">
-        <button class="choice-btn true" onclick="check(true)">😊</button>
-        <button class="choice-btn false" onclick="check(false)">😟</button>
+        <button class="true" onclick="check(true)">😊</button>
+        <button class="false" onclick="check(false)">😟</button>
     </div>
-
     <div id="feedback"></div>
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-const scenes = [true,false,true,false,true,true,true,false,true,false];
-let index = 0;
-let correctCount = 0;
-let audioUnlocked = false;
+const scenes=[true,false,true,false,true,true,true,false,true,false];
+let index=0,correct=0;
 
-const image = document.getElementById("image");
-const feedback = document.getElementById("feedback");
-const clapSound = document.getElementById("clapSound");
-const wrongSound = document.getElementById("wrongSound");
+const ding=dingSound,clap=clapSound,wrong=wrongSound;
 
-// 🔓 SES KİLİDİ
-function unlockAudio() {
-    if (audioUnlocked) return;
-    audioUnlocked = true;
-
-    clapSound.play().then(()=>{ clapSound.pause(); clapSound.currentTime=0; }).catch(()=>{});
-    wrongSound.play().then(()=>{ wrongSound.pause(); wrongSound.currentTime=0; }).catch(()=>{});
+function startGame(){
+    ding.play();
+    startScreen.style.display="none";
+    gameScreen.style.display="flex";
 }
 
-function startGame() {
-    unlockAudio();
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("gameScreen").style.display = "flex";
-}
-
-// CEVAP
-function check(choice) {
-    unlockAudio();
-
-    if (choice === scenes[index]) {
-        feedback.textContent = "👏";
-        clapSound.currentTime = 0;
-        clapSound.play();
-        correctCount++;
-    } else {
-        feedback.textContent = "🤔";
-        wrongSound.currentTime = 0;
-        wrongSound.play();
+function check(choice){
+    if(choice===scenes[index]){
+        feedback.textContent="👏";
+        clap.play();
+        correct++;
+    }else{
+        feedback.textContent="🤔";
+        wrong.play();
     }
 
-    setTimeout(() => {
-        feedback.textContent = "";
+    setTimeout(()=>{
+        feedback.textContent="";
         index++;
-        if (index < scenes.length) {
-            image.src = `img${index+1}.jpg`;
-        } else {
+        if(index<scenes.length){
+            image.src=`img${index+1}.jpg`;
+        }else{
             endGame();
         }
-    }, 1200);
+    },1200);
 }
 
-// 🎯 OYUN SONU – KAZANMA KONTROLÜ
-function endGame() {
-    image.style.display = "none";
-    document.querySelector(".buttons").style.display = "none";
+function endGame(){
+    gameScreen.innerHTML="";
+    const ratio=correct/scenes.length;
+    let stars="⭐".repeat(Math.round(ratio*5));
 
-    const ratio = correctCount / scenes.length;
-    const win = ratio >= 0.6;
-
-    const msg = document.createElement("div");
-    msg.id = "endMessage";
-
-    if (win) {
-        clapSound.play();
-        confetti({ particleCount: 150, spread: 90 });
-
-        msg.innerHTML = `
-            <h2>🎉 AFERİN 🎉</h2>
-            <p>Harika düşündün!</p>
-            <div style="display:flex; justify-content:space-around; margin-top:20px;">
-                <button onclick="showVideo()">▶️ Video İzle</button>
-                <button onclick="restartGame()">🔄 Tekrar Oyna</button>
-            </div>
-        `;
-    } else {
-        msg.innerHTML = `
-            <h2>🌱 Güzel denedin</h2>
-            <p>
-🌟 Biraz daha dene bakalım!<br>
-🎁 Daha çok bilirsen sana güzel bir video sürprizi var.
-</p>
-            <button onclick="restartGame()">🔄 Tekrar Dene</button>
-        `;
+    if(ratio>=0.6){
+        gameScreen.innerHTML=`
+        <h2>🌟 AFERİN 🌟</h2>
+        <p>${stars}</p>
+        <button onclick="showVideo()">🎬 Video İzle</button><br><br>
+        <button onclick="restart()">🔄 Tekrar Oyna</button>`;
+    }else{
+        gameScreen.innerHTML=`
+        <h2>🌱 Güzel denedin</h2>
+        <p>Daha çok bilirsen bir <b>video sürprizi</b> var 🎁</p>
+        <button onclick="restart()">🔄 Tekrar Dene</button>`;
     }
-
-    document.getElementById("gameScreen").appendChild(msg);
 }
 
-// 🎥 VIDEO
-function showVideo() {
-    const overlay = document.createElement("div");
-    overlay.className = "video-overlay";
-    overlay.innerHTML = `<div id="ytplayer"></div>`;
+function showVideo(){
+    const overlay=document.createElement("div");
+    overlay.className="video-overlay";
+    overlay.innerHTML=`<div id="ytplayer"></div>`;
     document.body.appendChild(overlay);
 
-    const VIDEO_ID = "QEubvr-ji74"; // 👈 SADECE BURAYI DEĞİŞTİR
-
-    new YT.Player("ytplayer", {
-        videoId: VIDEO_ID,
-        events: {
-            onReady: e => e.target.playVideo(),
-            onStateChange: e => {
-                if (e.data === YT.PlayerState.ENDED) {
+    new YT.Player("ytplayer",{
+        videoId:"QEubvr-ji74", // 👈 SADECE BURAYI DEĞİŞTİR
+        events:{
+            onReady:e=>e.target.playVideo(),
+            onStateChange:e=>{
+                if(e.data===YT.PlayerState.ENDED){
                     document.body.removeChild(overlay);
                 }
             }
@@ -208,14 +171,10 @@ function showVideo() {
     });
 }
 
-// 🔄 TEKRAR
-function restartGame() {
-    index = 0;
-    correctCount = 0;
-    image.style.display = "block";
-    document.querySelector(".buttons").style.display = "flex";
-    image.src = "img1.jpg";
-    document.getElementById("endMessage").remove();
+function restart(){
+    index=0;correct=0;
+    gameScreen.style.display="none";
+    startScreen.style.display="flex";
 }
 </script>
 
